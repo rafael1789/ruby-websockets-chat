@@ -1,17 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Ruby WebSockets Chat Demo</title>
+    <title>Ruby WebSockets Chat</title>
     <link href="assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="assets/css/application.css" rel="stylesheet" media="screen">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <div class="container">
-      <div class="jumbotron">
-        <h1>Ruby WebSockets Chat Demo</h1>
-        <p>This is a Ruby WebSockets Chat Demo. The code lives <a href="https://github.com/rafael1789/ruby-websockets-chat">on GitHub</a>. You can find the full guide <a href="https://devcenter.heroku.com/articles/ruby-websockets">on Heroku DevCenter</a>.</p>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Ruby WebSocket Chat</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" aria-expander="false" style="height: 1px;"></div>
       </div>
+    </nav>
+    <div class="jumbotron text-center">
+      <h1>Ruby WebSockets Chat</h1>
+      <p>It's just an example using ruby and websockets in creating a chat.</p>
+      <p><a class="btn btn-primary btn-lg" href="https://github.com/rafael1789/ruby-websockets-chat" role="button">
+          See the code on GitHub</a>
+      </p>
+    </div>
+    <div class="container">
       <form id="input-form" class="form-inline">
         <div class="form-group">
           <input id="input-handle" type="text" class="form-control" placeholder="Enter handle" autofocus />
@@ -31,4 +42,9 @@
     <script type="text/javascript" src="assets/js/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="assets/js/application.js"></script>
   </body>
+  <footer class="footer">
+    <div class="container">
+      <p class="text-muted">© Company 2015</p>
+    </div>
+  </footer>
 </html>
