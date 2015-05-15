@@ -42,7 +42,7 @@ module ChatDemo
 			  ws = nil
 			end
 			            
-            # Return async Rack response
+        # Return async Rack response
     		ws.rack_response
     	else
     		@app.call(env)
