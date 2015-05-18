@@ -3,6 +3,7 @@ require 'sinatra/base'
 module ChatDemo
   class App < Sinatra::Base
     get "/" do
+      @root = request.path_info
       erb :"index.html"
     end
 
