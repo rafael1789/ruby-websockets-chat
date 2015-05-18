@@ -1,19 +1,102 @@
-var scheme   = "<%= @scheme %>";
-var uri      = scheme + window.document.location.host + "/";
-var ws       = new WebSocket(uri);
+$(document).ready(function(){
+  if (typeof WebSocket != 'undefined') {
+    $('#questions').show();
+  } else {
+    $('#error').show();
+  }
+  
+  // join on enter
+  $('#questions input').keydown(function(event) {
+    if (event.keyCode == 13) {
+      $('#questions button').click();
+    }
+  })
+  
+  // join on click
+  $('#questions button').click(function() {
+    var handle = $('#handle').val();
+    var channel = $('#input-channel').val();
+    if ((handle == null || handle == "") || (channel == null || channel == "")) {
+        alert("Name and channel must be filled out");
+        return false;
+    } else {
+      join(handle, channel);
+      $('#questions').hide();
+      $('#channel').show();
+      $('input#message').focus();
+    }
+  });
 
-ws.onmessage = function(message) {
-  var data = JSON.parse(message.data);
-  $("#chat-text").append("<div class='panel panel-default'><div class='panel-heading'>" + data.handle + "</div><div class='panel-body'>" + data.text + "</div></div>");
-  $("#chat-text").stop().animate({
-    scrollTop: $('#chat-text')[0].scrollHeight
-  }, 800);
-};
+  function join(name, channel) {
+    var scheme   = "<%= @scheme %>";
+    var uri      = scheme + window.document.location.host + "/";
+    var channels = {};
+    //var ws       = new WebSocket(uri);
+    var container = $('div#msgs');
+    var ws, url;
 
-$("#input-form").on("submit", function(event) {
-  event.preventDefault();
-  var handle = $("#input-handle")[0].value;
-  var text   = $("#input-text")[0].value;
-  ws.send(JSON.stringify({ handle: handle, text: text }));
-  $("#input-text")[0].value = "";
+    /*
+      Appends each channel to the URL via querystring. Example:  
+        ws://localhost/?channels[]=channel1&channels[]=channel2
+    */
+
+    //When the middelware receives this connection, it will take the channels
+    //sent through ?channels[] and add each one to that client.
+    url = uri + "?" + "channels[]=" + channel;
+    
+    ws = new WebSocket(url);
+
+    ws.onmessage = function(message) {
+      var data = JSON.parse(message.data);
+
+      if (typeof data != 'object') return;
+ 
+      var action = data['action'];
+
+      var struct = container.find('li.' + action + ':first');
+
+      if (struct.length < 1) {
+        console.log("Could not handle: " + message.data);
+        return;
+      }
+
+      var msg = struct.clone();
+      msg.find('.time').text((new Date()).toLocaleTimeString());
+
+      if (action == 'message') {
+        var matches;
+        if (matches = data['message'].match(/^\s*[\/\\]me\s(.*)/)) {
+          msg.find('.user').text(data['user'] + ' ' + matches[1]);
+          msg.find('.user').css('font-weight', 'bold');
+        } else {
+          msg.find('.user').text(data['user']);
+          msg.find('.message').text(': ' + data['message']);
+        }
+      } else if (action == 'control'){
+        msg.find('.user').text(data['user']);
+        msg.find('.message').text(data['message']);
+        msg.addClass('control');
+      }
+
+      if (data['user'] == name) msg.find('.user').addClass('self');
+
+      container.find('ul').append(msg.show());
+      container.scrollTop(container.find('ul').innerHeight());
+    };
+
+    
+    $("#channel form").on("submit", function(event) {
+      event.preventDefault();
+      var input = $(this).find(':input');
+      var msg = input.val();
+      ws.send(JSON.stringify({ action: 'message', message: msg, user: name, channel: channel }));
+      input.val('');
+    });
+
+    // send name when joining
+    ws.onopen = function() {
+      ws.send(JSON.stringify({ action: 'join', user: name }));
+    }
+    
+  }
 });
